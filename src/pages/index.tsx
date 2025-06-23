@@ -1,115 +1,88 @@
-import Image from "next/image";
-import { Geist, Geist_Mono } from "next/font/google";
-
-const geistSans = Geist({
-  variable: "--font-geist-sans",
-  subsets: ["latin"],
-});
-
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
-});
+import Head from "next/head";
 
 export default function Home() {
   return (
-    <div
-      className={`${geistSans.className} ${geistMono.className} grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]`}
-    >
-      <main className="flex flex-col gap-[32px] row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
+    <>
+      <Head>
+        <title>eSIM Монгол – Шуурхай холболт</title>
+        <meta
+          name="description"
+          content="Аялагчид болон Монголын хэрэглэгчдэд зориулсан хурдан, хялбар eSIM үйлчилгээ."
         />
-        <ol className="list-inside list-decimal text-sm/6 text-center sm:text-left font-[family-name:var(--font-geist-mono)]">
-          <li className="mb-2 tracking-[-.01em]">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] px-1 py-0.5 rounded font-[family-name:var(--font-geist-mono)] font-semibold">
-              src/pages/index.tsx
-            </code>
-            .
-          </li>
-          <li className="tracking-[-.01em]">
-            Save and see your changes instantly.
-          </li>
-        </ol>
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
+      </Head>
+
+      <main className="min-h-screen bg-white text-gray-800">
+        {/* Header */}
+        <header className="w-full px-6 py-4 shadow-sm flex justify-between items-center">
+          <h1 className="text-2xl font-bold text-blue-600">eSIM Монгол</h1>
+          <nav className="space-x-4">
+            <a href="/plans" className="text-gray-700 hover:text-blue-500">Багцууд</a>
+            <a href="/faq" className="text-gray-700 hover:text-blue-500">Тусламж</a>
+            <a href="/contact" className="text-gray-700 hover:text-blue-500">Холбоо барих</a>
+          </nav>
+        </header>
+
+        {/* Hero Section */}
+        <section className="px-6 py-20 text-center bg-blue-50">
+          <h2 className="text-4xl font-bold mb-4">Монголд зориулсан eSIM үйлчилгээ</h2>
+          <p className="text-lg mb-6">СИМ карт хэрэггүй. QR код уншуулаад шууд холбогдоорой!</p>
           <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:w-auto"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=default-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
+            href="/plans"
+            className="inline-block bg-blue-600 text-white px-6 py-3 rounded-xl text-lg hover:bg-blue-700 transition"
           >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
-            Deploy now
+            Багц харах
           </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 w-full sm:w-auto md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=default-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Read our docs
-          </a>
-        </div>
+        </section>
+
+        {/* Popular eSIM Countries */}
+        <section className="px-6 py-12 bg-white text-center">
+          <h3 className="text-2xl font-bold mb-6">Түгээмэл улсуудад зориулсан eSIM</h3>
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-6 max-w-5xl mx-auto">
+            {[
+              { name: "Япон", code: "🇯🇵" },
+              { name: "Өмнөд Солонгос", code: "🇰🇷" },
+              { name: "Тайланд", code: "🇹🇭" },
+              { name: "АНУ", code: "🇺🇸" },
+              { name: "Герман", code: "🇩🇪" },
+              { name: "Франц", code: "🇫🇷" },
+              { name: "Их Британи", code: "🇬🇧" },
+              { name: "Вьетнам", code: "🇻🇳" },
+              { name: "Хятад", code: "🇨🇳" },
+              { name: "Сингапур", code: "🇸🇬" },
+            ].map((country) => (
+              <a
+                key={country.name}
+                href={`/plans?country=${country.name.toLowerCase()}`}
+                className="block border rounded-xl p-4 hover:shadow-lg transition"
+              >
+                <div className="text-3xl mb-2">{country.code}</div>
+                <div className="text-lg font-medium">{country.name}</div>
+              </a>
+            ))}
+          </div>
+        </section>
+
+        {/* Feature Highlights */}
+        <section className="px-6 py-16 grid md:grid-cols-3 gap-10 text-center">
+          <div>
+            <h3 className="text-xl font-semibold mb-2">Шуурхай хүргэлт</h3>
+            <p>Төлбөр хийсний дараа QR кодыг шууд авна.</p>
+          </div>
+          <div>
+            <h3 className="text-xl font-semibold mb-2">Роуминггүй</h3>
+            <p>Дотоодын үнээр хэрэглээрэй. Нуугдмал зардал байхгүй.</p>
+          </div>
+          <div>
+            <h3 className="text-xl font-semibold mb-2">Хялбар суулгалт</h3>
+            <p>QR код уншуулаад, суулгаад, шууд ашигла.</p>
+          </div>
+        </section>
+
+        {/* Footer */}
+        <footer className="bg-gray-100 py-4 text-center text-sm text-gray-500">
+          © {new Date().getFullYear()} eSIM Монгол. Бүх эрх хуулиар хамгаалагдсан.
+        </footer>
       </main>
-      <footer className="row-start-3 flex gap-[24px] flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=default-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=default-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=default-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
-      </footer>
-    </div>
+    </>
   );
 }
