@@ -1,4 +1,5 @@
 import Head from "next/head";
+import Navbar from "@/components/navbar";
 
 export default function Home() {
   return (
@@ -13,14 +14,7 @@ export default function Home() {
 
       <main className="min-h-screen bg-white text-gray-800">
         {/* Header */}
-        <header className="w-full px-6 py-4 shadow-sm flex justify-between items-center">
-          <h1 className="text-2xl font-bold text-blue-600">eSIM Монгол</h1>
-          <nav className="space-x-4">
-            <a href="/plans" className="text-gray-700 hover:text-blue-500">Багцууд</a>
-            <a href="/faq" className="text-gray-700 hover:text-blue-500">Тусламж</a>
-            <a href="/contact" className="text-gray-700 hover:text-blue-500">Холбоо барих</a>
-          </nav>
-        </header>
+        <Navbar />
 
         {/* Hero Section */}
         <section className="px-6 py-20 text-center bg-blue-50">
