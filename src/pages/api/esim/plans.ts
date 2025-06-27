@@ -2,6 +2,7 @@ import type { NextApiRequest, NextApiResponse } from "next";
 
 // pages/api/esim/plans.ts
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
+  const { locationCode = "" } = req.query;
   const response = await fetch("https://api.esimaccess.com/api/v1/open/package/list", {
     method: "POST",
     headers: {
@@ -10,7 +11,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       "RT-SecretCode": process.env.ESIM_SECRET_KEY ?? ""    // Set in .env.local
     },
     body: JSON.stringify({
-      locationCode: "",
+      locationCode,
       type: "",
       slug: "",
       packageCode: "",

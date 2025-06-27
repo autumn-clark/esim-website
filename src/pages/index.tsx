@@ -33,20 +33,20 @@ export default function Home() {
           <h3 className="text-2xl font-bold mb-6">Түгээмэл улсуудад зориулсан eSIM</h3>
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-6 max-w-5xl mx-auto">
             {[
-              { name: "Япон", code: "🇯🇵" },
-              { name: "Өмнөд Солонгос", code: "🇰🇷" },
-              { name: "Тайланд", code: "🇹🇭" },
-              { name: "АНУ", code: "🇺🇸" },
-              { name: "Герман", code: "🇩🇪" },
-              { name: "Франц", code: "🇫🇷" },
-              { name: "Их Британи", code: "🇬🇧" },
-              { name: "Вьетнам", code: "🇻🇳" },
-              { name: "Хятад", code: "🇨🇳" },
-              { name: "Сингапур", code: "🇸🇬" },
+              { name: "Япон", code: "🇯🇵" , locationCode: "JP"},
+              { name: "Өмнөд Солонгос", code: "🇰🇷" , locationCode: "KR"},
+              { name: "Тайланд", code: "🇹🇭" , locationCode: "TH"},
+              { name: "АНУ", code: "🇺🇸" , nalocationCodemeEn: "US"},
+              { name: "Герман", code: "🇩🇪" , locationCode: "DE"},
+              { name: "Франц", code: "🇫🇷" , locationCode: "FR"},
+              { name: "Их Британи", code: "🇬🇧" , locationCode: "GB"},
+              { name: "Вьетнам", code: "🇻🇳" , locationCode: "VN"},
+              { name: "Хятад", code: "🇨🇳" , locationCode: "CH"},
+              { name: "Сингапур", code: "🇸🇬" , locationCode: "SG"},
             ].map((country) => (
               <a
-                key={country.name}
-                href={`/plans?country=${country.name.toLowerCase()}`}
+                key={country.locationCode}
+                href={`/plans?locationCode=${country.locationCode}`}
                 className="block border rounded-xl p-4 hover:shadow-lg transition"
               >
                 <div className="text-3xl mb-2">{country.code}</div>

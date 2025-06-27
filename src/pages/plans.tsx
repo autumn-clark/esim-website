@@ -1,100 +1,90 @@
 // src/pages/plans.tsx
 import Head from "next/head";
 import type { GetServerSideProps, InferGetServerSidePropsType } from "next";
-import { useRouter } from "next/router";
-
-type Package = {
-  packageCode: string;
-  slug: string;
-  name: string;
-  price: number;
-  currencyCode: string;
-  volume: number;
-  duration: number;
-  durationUnit: string;
-  location: string;
-  description: string;
-  locationNetworkList: {
-    locationName: string;
-    locationLogo: string;
-    operatorList: { operatorName: string; networkType: string }[];
-  }[];
-};
+import { Package } from "../components/Package";
+import { PlanCard } from "@/components/plan-card";
 
 export const getServerSideProps: GetServerSideProps<{
-  packages: Package[];
+  local: Package[];
+  global: Package[];
 }> = async (context) => {
-  // Fetch from your internal API route (which calls esimaccess with keys)
-  const res = await fetch(`${process.env.NEXTAUTH_URL}/api/esim/plans`);
+  const locationCode = (context.query.locationCode as string)?.toUpperCase() || "";
+
+  const res = await fetch(`${process.env.NEXTAUTH_URL}/api/esim/plans?locationCode=${locationCode}`);
   const data = await res.json();
+  const allPackages = data.obj?.packageList || [];
+
+  const local = allPackages.filter((pkg: Package) =>
+    pkg.location === locationCode
+  );
+  const global = allPackages.filter(
+    (pkg: Package) =>
+      pkg.location.split(",").includes(locationCode) && pkg.location !== locationCode
+  );
+
 
   return {
-    props: {
-      packages: data.obj?.packageList || [],
-    },
+    props: { local, global, locationCode },
   };
 };
 
 export default function PlansPage({
-  packages,
+  local,
+  global
 }: InferGetServerSidePropsType<typeof getServerSideProps>) {
-  const router = useRouter();
-  const countryQuery = (router.query.country as string) || "";
+  const matchedLocation = local.at(0)?.name;
 
-  // Filter packages by country query param (case-insensitive substring match)
-  const filteredPackages = countryQuery
-    ? packages.filter((pkg) =>
-        pkg.location.toLowerCase().includes(countryQuery.toLowerCase())
-      )
-    : packages;
+  function extractCountryName(name: string): string {
+    // Remove anything in parentheses
+    let cleaned = name.replace(/\s*\([^)]*\)/g, "");
+    // Remove common data and duration patterns like '5GB', '30Days', etc.
+    cleaned = cleaned.replace(/\d+\s*GB/gi, "");
+    cleaned = cleaned.replace(/\d+\s*(Days|Day|хоног)/gi, "");
+    // Trim whitespace
+    return cleaned.trim();
+  }
 
   return (
     <>
       <Head>
         <title>eSIM Багцууд – Монгол</title>
       </Head>
-
       <main className="min-h-screen px-6 py-10 bg-white text-gray-800">
         <h1 className="text-3xl font-bold text-center mb-10">eSIM багцууд</h1>
 
-        {filteredPackages.length === 0 ? (
-          <p className="text-center text-gray-500">Багц олдсонгүй.</p>
-        ) : (
-          <div className="grid gap-6 max-w-6xl mx-auto md:grid-cols-3">
-            {filteredPackages.map((pkg) => (
-              <div
+        {/* Local packages */}
+        {local.length > 0 && (
+          <>
+            <h2 className="text-xl font-bold mb-4">🌐 Улсдаа зориулсан багцууд</h2>
+            <div className="grid gap-6 max-w-6xl mx-auto md:grid-cols-3 mb-10">
+              {local.map((pkg) => (
+                <PlanCard key={pkg.packageCode} pkg={pkg} />
+              ))}
+            </div>
+          </>
+        )}
+
+        {/* Global packages */}
+
+        <div className="grid gap-6 max-w-6xl mx-auto md:grid-cols-3 mb-10">
+          {global.map((pkg) => {
+            return (
+
+              <PlanCard
                 key={pkg.packageCode}
-                className="border rounded-xl p-6 shadow hover:shadow-lg transition"
-              >
-                <h2 className="text-xl font-semibold mb-2">{pkg.name}</h2>
-                <p>Үзүүлэх улс: {pkg.location}</p>
-                <p>Дата хэмжээ: {(pkg.volume / (1024 ** 3)).toFixed(2)} GB</p>
-                <p>
-                  Хугацаа: {pkg.duration} {pkg.durationUnit.toLowerCase()}
-                </p>
-                <p className="text-blue-600 font-bold mt-2">
-                  {pkg.price.toLocaleString()} {pkg.currencyCode}
-                </p>
+                pkg={pkg}
+                isGlobal={true}
+                mainCountryName={extractCountryName(matchedLocation || "Улс")}
+              />
 
-                <div className="mt-4 flex flex-wrap gap-2">
-                  {pkg.locationNetworkList.map((loc) => (
-                    <div key={loc.locationName} className="flex items-center space-x-2">
-                      <img
-                        src={`https://api.esimaccess.com${loc.locationLogo}`}
-                        alt={loc.locationName}
-                        className="w-6 h-4 object-cover rounded-sm"
-                      />
-                      <span className="font-medium">{loc.locationName}</span>
-                    </div>
-                  ))}
-                </div>
+            );
+          })}
 
-                <button className="mt-4 w-full bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700 transition">
-                  Худалдан авах
-                </button>
-              </div>
-            ))}
-          </div>
+        </div>
+
+
+        {local.length === 0 && global.length === 0 && (
+          <p className="text-center text-gray-500">Багц олдсонгүй.</p>
         )}
       </main>
     </>
