@@ -21,7 +21,7 @@ export default function Navbar() {
   }, []);
 
   return (
-    <header className="w-full px-6 py-4 shadow-sm flex justify-between items-center">
+    <header className="w-full fixed bg-gray-50 px-6 py-4 shadow-sm flex justify-between items-center z-20">
       <h1 className="text-2xl font-bold text-blue-600 cursor-pointer" onClick={() => router.push("/")}>
         eSIM Монгол
       </h1>
@@ -53,7 +53,7 @@ export default function Navbar() {
                   Миний мэдээлэл
                 </a>
                 <a
-                  href="/orders"
+                  href="/my-orders"
                   className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
                 >
                   Захиалгууд

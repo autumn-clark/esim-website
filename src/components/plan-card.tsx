@@ -1,74 +1,99 @@
-// src/components/PlanCard.tsx
-import React from "react";
-import type { Package } from "./Package";
+import React, { useState } from "react";
+import { useSession } from "next-auth/react";
+import type { Package } from "../models/Package";
+import { PayPalCheckoutButton } from "./paypal-checkout-button";
 
 interface PlanCardProps {
-  pkg: Package;
-  isGlobal?: boolean;
-  mainCountryName?: string;
+    pkg: Package;
+    isGlobal?: boolean;
+    mainCountryName?: string;
 }
 
 export function PlanCard({ pkg, isGlobal = false, mainCountryName = "" }: PlanCardProps) {
-  const formattedData = (pkg.volume / (1024 ** 3)).toFixed(2);
+    const [showPayPal, setShowPayPal] = useState(false);
+    const { data: session } = useSession();
 
-  const handlePurchase = async () => {
-    try {
-      const res = await fetch("/api/esim/order", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          transactionId: `txn-${Date.now()}`,
-          packageCode: pkg.packageCode,
-          price: pkg.price,
-          count: 1,
-        }),
-      });
+    const formattedData = (pkg.volume / (1024 ** 3)).toFixed(2);
 
-      const data = await res.json();
+    const handleOrder = async (transactionId: string) => {
+        if (!session?.user?.email) {
+            alert("Please login to place an order.");
+            return;
+        }
 
-      if (!res.ok) {
-        alert("Захиалга амжилтгүй боллоо: " + data.error);
-        return;
-      }
+        try {
+            const res = await fetch("/api/esim/order", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    transactionId,
+                    packageCode: pkg.packageCode,
+                    price: pkg.price,
+                    userEmail: session.user.email,
+                }),
+            });
 
-      alert("Захиалга амжилттай! Order No: " + data.orderNo);
-    } catch (err) {
-      console.error("Order error:", err);
-      alert("Алдаа гарлаа. Дахин оролдоно уу.");
-    }
-  };
+            const data = await res.json();
 
-  return (
-    <div className="border rounded-xl p-6 shadow hover:shadow-lg transition">
-      <h2 className="text-xl font-semibold mb-2">{pkg.name}</h2>
-      <p>Дата: {formattedData} GB</p>
-      <p>Хугацаа: {pkg.duration} {pkg.durationUnit.toLowerCase()}</p>
-      <p className="text-blue-600 font-bold mt-2">
-        {pkg.price.toLocaleString()} {pkg.currencyCode}
-      </p>
+            if (!res.ok || !data.success || !data.obj) {
+                alert("Order failed: " + (data.error || "Unknown error"));
+                return;
+            }
 
-      <div className="mt-4 flex flex-wrap gap-2">
-        {isGlobal ? (
-          <div className="flex items-center space-x-2">
-            <span className="font-medium">{mainCountryName} and {pkg.locationNetworkList.length - 1} more</span>
-          </div>
-        ) : (
-          pkg.locationNetworkList.map((loc) => (
-            <div key={loc.locationName} className="flex items-center space-x-2">
-              <span className="font-medium">{loc.locationName}</span>
+            alert("Order successful! Order No: " + data.obj.orderNo);
+        } catch (error) {
+            console.error("Order error:", error);
+            alert("An error occurred during order. Please try again.");
+        }
+    };
+
+    return (
+        <div className="border rounded-xl p-6 shadow hover:shadow-lg transition">
+            <h2 className="text-xl font-semibold mb-2">{pkg.name}</h2>
+            <p>Дата: {formattedData} GB</p>
+            <p>Хугацаа: {pkg.duration} {pkg.durationUnit.toLowerCase()}</p>
+            <p className="text-blue-600 font-bold mt-2">
+                {pkg.price.toLocaleString()} {pkg.currencyCode}
+            </p>
+
+            <div className="mt-4 flex flex-wrap gap-2">
+                {isGlobal ? (
+                    <div className="flex items-center space-x-2">
+                        <span className="font-medium">{mainCountryName} and {pkg.locationNetworkList.length - 1} more</span>
+                    </div>
+                ) : (
+                    pkg.locationNetworkList.map((loc) => (
+                        <div key={loc.locationName} className="flex items-center space-x-2">
+                            <span className="font-medium">{loc.locationName}</span>
+                        </div>
+                    ))
+                )}
             </div>
-          ))
-        )}
-      </div>
 
-      <button
-        onClick={handlePurchase}
-        className="mt-4 w-full bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700 transition"
-      >
-        Худалдан авах
-      </button>
-    </div>
-  );
+            {showPayPal ? (
+                <PayPalCheckoutButton
+                amount={(pkg.price / 100).toFixed(2)}
+                onSuccess={async (details) => {
+                  const captureStatus = details?.purchase_units?.[0]?.payments?.captures?.[0]?.status;
+              
+                  if (captureStatus === "COMPLETED") {
+                    await handleOrder(details.id);
+                    setShowPayPal(false);
+                  } else {
+                    alert("💳 Payment failed. eSIM not ordered.");
+                  }
+                }}
+              />
+              
+
+            ) : (
+                <button
+                    className="mt-4 w-full bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700 transition"
+                    onClick={() => setShowPayPal(true)}
+                >
+                    Худалдан авах
+                </button>
+            )}
+        </div>
+    );
 }

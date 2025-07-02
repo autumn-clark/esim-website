@@ -12,12 +12,10 @@ export default function Home() {
         />
       </Head>
 
-      <main className="min-h-screen bg-white text-gray-800">
+      <main className="min-h-screen text-gray-800">
         {/* Header */}
-        <Navbar />
-
         {/* Hero Section */}
-        <section className="px-6 py-20 text-center bg-blue-50">
+        <section className="px-6 py-20 text-center">
           <h2 className="text-4xl font-bold mb-4">Монголд зориулсан eSIM үйлчилгээ</h2>
           <p className="text-lg mb-6">СИМ карт хэрэггүй. QR код уншуулаад шууд холбогдоорой!</p>
           <a
@@ -29,7 +27,7 @@ export default function Home() {
         </section>
 
         {/* Popular eSIM Countries */}
-        <section className="px-6 py-12 bg-white text-center">
+        <section className="px-6 py-12  text-center">
           <h3 className="text-2xl font-bold mb-6">Түгээмэл улсуудад зориулсан eSIM</h3>
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-6 max-w-5xl mx-auto">
             {[
